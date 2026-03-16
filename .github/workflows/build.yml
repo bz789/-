@@ -18,19 +18,18 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Validate Gradle wrapper
-      uses: gradle/actions/wrapper-validation@v3
-
-    - name: Setup Gradle
-      uses: gradle/gradle-build-action@v3
-      with:
-        gradle-version: wrapper
+    - name: Install Gradle
+      run: |
+        wget https://services.gradle.org/distributions/gradle-8.2-bin.zip -P /tmp
+        unzip /tmp/gradle-8.2-bin.zip -d /opt
+        export PATH=$PATH:/opt/gradle-8.2/bin
+        echo "/opt/gradle-8.2/bin" >> $GITHUB_PATH
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
     - name: Build Debug APK
-      run: ./gradlew assembleDebug --no-daemon --stacktrace
+      run: /opt/gradle-8.2/bin/gradle assembleDebug --no-daemon --stacktrace
 
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4
@@ -39,7 +38,7 @@ jobs:
         path: app/build/outputs/apk/debug/app-debug.apk
 
     - name: Build Release APK
-      run: ./gradlew assembleRelease --no-daemon --stacktrace
+      run: /opt/gradle-8.2/bin/gradle assembleRelease --no-daemon --stacktrace
 
     - name: Upload Release APK
       uses: actions/upload-artifact@v4
